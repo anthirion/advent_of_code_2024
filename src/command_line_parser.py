@@ -14,6 +14,9 @@ def get_arguments_from_command_line() -> tuple[str, int]:
     args = parser.parse_args()
     filename = args.filename
     part = int(args.part)
+    # vérifier que le nom du fichier se termine par ".txt"
+    if not filename.endswith(".txt"):
+        raise ValueError("Filename MUST be a txt file")
     # vérifier que le numéro de la partie est 1 ou 2
     if part not in (1, 2):
         raise ValueError("Part argument (--part) MUST be 1 or 2")
