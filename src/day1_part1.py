@@ -4,7 +4,7 @@ def distance(a: int, b: int) -> int:
     return max(a, b) - min(a, b)
 
 
-def reconcile_lists(l1: list[int], l2: list[int]) -> int:
+def list_similarity(l1: list[int], l2: list[int]) -> int:
     assert len(l1) == len(l2)
     l1.sort()
     l2.sort()
@@ -20,6 +20,7 @@ def build_lists(filename: str) -> tuple[list, list]:
     l1, l2 = [], []
     with open(filename, 'r', encoding='utf8') as file:
         for line in file:
+            # ignorer les lignes vides
             if line:
                 # s'assurer qu'il y a bien 2 colonnes par ligne
                 list_of_elements: list[str] = line.split()
@@ -32,9 +33,9 @@ def build_lists(filename: str) -> tuple[list, list]:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-                    prog='List reconcialiation',
+                    prog='List reconciliation',
                     description='Compute the distance between 2 lists')
     parser.add_argument('filename')
     args = parser.parse_args()
     l1, l2 = build_lists(args.filename)
-    print("Total distance:", reconcile_lists(l1, l2))
+    print("List similarity:", list_similarity(l1, l2))
