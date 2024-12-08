@@ -1,4 +1,4 @@
-import argparse
+from command_line_parser import get_arguments_from_command_line
 
 def distance(a: int, b: int) -> int:
     return max(a, b) - min(a, b)
@@ -32,10 +32,9 @@ def build_lists(filename: str) -> tuple[list, list]:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-                    prog='List reconciliation',
-                    description='Compute the distance between 2 lists')
-    parser.add_argument('filename')
-    args = parser.parse_args()
-    l1, l2 = build_lists(args.filename)
-    print("List similarity:", list_similarity(l1, l2))
+    filename, part = get_arguments_from_command_line()
+    l1, l2 = build_lists(filename)
+    if part == 1:
+        print("List similarity:", list_similarity(l1, l2))
+    elif part == 2:
+        print("part 2 to be implemented")
