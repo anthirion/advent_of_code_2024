@@ -1,10 +1,15 @@
 from command_line_parser import get_arguments_from_command_line
 
+################################## PART 1 ##################################
+
 def distance(a: int, b: int) -> int:
     return max(a, b) - min(a, b)
 
-
 def list_similarity(l1: list[int], l2: list[int]) -> int:
+    """
+    La similarité de 2 listes est calculée en additionnant les distances entre les éléments
+    des 2 listes
+    """
     assert len(l1) == len(l2)
     l1.sort()
     l2.sort()
@@ -32,6 +37,19 @@ def build_lists(filename: str) -> tuple[list, list]:
         print("WARNING: the two lists are empty. It means that the file is probably empty.")
     return l1, l2
 
+################################## PART 2 ##################################
+
+def second_similarity_score(l1: list[int], l2: list[int]) -> int:
+    """
+    Ce second score de similarité est calculé en additionnant chaque nombre de la liste 1
+    après l'avoir multiplié par le nombre de fois qu'il apparaît dans la liste 2
+    """
+    # nombre d'occurences dans la liste l2 des éléments de l1
+    occurences = [l2.count(element) for element in l1]
+    return sum(element*occurences for element, occurences in zip(l1, occurences))
+
+
+############################## LAUNCH PROGRAM ##############################
 
 if __name__ == "__main__":
     filename, part = get_arguments_from_command_line()
@@ -39,4 +57,4 @@ if __name__ == "__main__":
     if part == 1:
         print("List similarity:", list_similarity(l1, l2))
     elif part == 2:
-        print("part 2 to be implemented")
+        print("Second list similarity score:", second_similarity_score(l1, l2))
