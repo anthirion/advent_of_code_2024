@@ -28,6 +28,8 @@ def build_lists(filename: str) -> tuple[list, list]:
                 element_of_first_list, element_of_second_list = list_of_elements
                 l1.append(int(element_of_first_list))
                 l2.append(int(element_of_second_list))
+    if len(l1) == 0 and len(l2) == 0:
+        print("WARNING: the two lists are empty. It means that the file is probably empty.")
     return l1, l2
 
 
