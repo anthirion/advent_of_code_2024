@@ -15,6 +15,20 @@ def list_similarity(l1: list[int], l2: list[int]) -> int:
     l2.sort()
     return sum(distance(i, j) for i, j in zip(l1, l2))
 
+################################## PART 2 ##################################
+
+def second_similarity_score(l1: list[int], l2: list[int]) -> int:
+    """
+    Ce second score de similarité est calculé en additionnant chaque nombre de la liste 1
+    après l'avoir multiplié par le nombre de fois qu'il apparaît dans la liste 2
+    """
+    # nombre d'occurences dans la liste l2 des éléments de l1
+    occurences = [l2.count(element) for element in l1]
+    return sum(element*occurences for element, occurences in zip(l1, occurences))
+
+
+############################## LAUNCH PROGRAM ##############################
+
 def build_lists(filename: str) -> tuple[list, list]:
     """Construit les listes à réconcilier à partir
     d'un fichier dont la première colonne représente la première
@@ -36,20 +50,6 @@ def build_lists(filename: str) -> tuple[list, list]:
     if len(l1) == 0 and len(l2) == 0:
         print("WARNING: the two lists are empty. It means that the file is probably empty.")
     return l1, l2
-
-################################## PART 2 ##################################
-
-def second_similarity_score(l1: list[int], l2: list[int]) -> int:
-    """
-    Ce second score de similarité est calculé en additionnant chaque nombre de la liste 1
-    après l'avoir multiplié par le nombre de fois qu'il apparaît dans la liste 2
-    """
-    # nombre d'occurences dans la liste l2 des éléments de l1
-    occurences = [l2.count(element) for element in l1]
-    return sum(element*occurences for element, occurences in zip(l1, occurences))
-
-
-############################## LAUNCH PROGRAM ##############################
 
 if __name__ == "__main__":
     filename, part = get_arguments_from_command_line()
