@@ -1,7 +1,6 @@
 from command_line_parser import get_arguments_from_command_line
 import re
 from collections import defaultdict
-from typing import Iterator
 
 ################################## PART 1 ##################################
 
@@ -30,18 +29,21 @@ def update_is_correct(update_pages: list[str], rules_dependencies: dict[int, lis
   :param update: liste de pages à imprimer pour faire l'update
   :returns True si l'update est correcte, False sinon
   """
+  assert len(update_pages) > 0
   # la liste d'updates est parcourue en sens inverse
   for page_index in range(len(update_pages) - 1, -1, -1):
     page = update_pages[page_index]
-    dependencies = rules_dependencies[page]
-    for dependency in dependencies:
-      if dependency in update_pages[:page_index]:
-        return False
+    if page in rules_dependencies.keys():
+      dependencies = rules_dependencies[page]
+      for dependency in dependencies:
+        if dependency in update_pages[:page_index]:
+          return False
   return True
 
 
 def sum_middle_page_numbers_p1(updates: list[str], rules: list[str]) -> int:
   """Somme les numéros de pages médians de toutes les màj correctes"""
+  assert len(updates) > 0 and len(rules) > 0
   sum = 0
   rules_dependencies = build_rule_dependencies(rules)
   for update in updates:
@@ -52,6 +54,44 @@ def sum_middle_page_numbers_p1(updates: list[str], rules: list[str]) -> int:
 
 
 ################################## PART 2 ##################################
+
+def swap(liste: list[str], index1: int, index2: int) -> None:
+  if 0 <= index1 < len(liste) and 0 <= index2 < len(liste):
+    liste[index1], liste[index2] = liste[index2], liste[index1]
+  else:
+    raise IndexError
+
+
+def reorder_incorrect_update(update_pages: list[str], rules_dependencies: dict[int, list[str]]) -> None:
+  """Remet une màj incorrecte dans un ordre correct
+  :returns liste des pages de la màj dans le bon ordre
+  ATTENTION: la liste update_pages est modifiée EN PLACE
+  """
+  assert len(update_pages) > 0
+  while not update_is_correct(update_pages, rules_dependencies):
+    for page_index in range(len(update_pages) - 1, -1, -1):
+      page = update_pages[page_index]
+      if page in rules_dependencies.keys():
+        dependencies = rules_dependencies[page]
+        for dependency in dependencies:
+          try:
+            dependency_index = update_pages.index(dependency, 0, page_index)
+            swap(update_pages, dependency_index, page_index)
+          except ValueError:
+            # la dépendance n'a pas été trouvée
+            continue
+
+
+def sum_middle_page_numbers_p2(updates: list[str], rules: list[str]) -> int:
+  """Somme les numéros de pages médians de toutes les màj incorrectes"""
+  sum = 0
+  rules_dependencies = build_rule_dependencies(rules)
+  for update in updates:
+    update_pages = update.split(',')
+    if not update_is_correct(update_pages, rules_dependencies):
+      reorder_incorrect_update(update_pages, rules_dependencies)
+      sum += int(update_pages[len(update_pages) // 2])
+  return sum
 
 ############################## LAUNCH PROGRAM ##############################
 
@@ -81,4 +121,5 @@ if __name__ == "__main__":
     print("Sum of median page numbers for correct updates only:",
           sum_middle_page_numbers_p1(updates, rules))
   elif part == 2:
-    print("Part 2 to be implemented")
+    print("Sum of median page numbers for incorrect updates only:",
+          sum_middle_page_numbers_p2(updates, rules))
