@@ -12,3 +12,12 @@ with open(filename, 'r', encoding='utf8') as file:
 ```
 
 - fonction reduce
+
+# Jour 4
+
+- ATTENTION en python, liste[-1] ne retourne pas d'erreur
+  Par conséquent, bien vérifier que les indices sont positifs
+
+# Jour 5
+
+- retourner l'index où se trouve l'élément d'une liste -> list.index()
