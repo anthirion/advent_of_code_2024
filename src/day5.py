@@ -5,7 +5,7 @@ from collections import defaultdict
 ################################## PART 1 ##################################
 
 
-def build_rule_dependencies(rules: list[str]) -> dict[int, list[str]]:
+def build_rule_dependencies(rules: list[str]) -> dict[str, list[str]]:
   """Construit les dépendances de chaque page en fonction de la liste des
   règles. Par exemple, pour la page 75, la fonction indiquera toutes les pages
   qui doivent être imprimées APRES la page 75 (les pages à droite du symbole |)
@@ -24,7 +24,7 @@ def build_rule_dependencies(rules: list[str]) -> dict[int, list[str]]:
   return rules_dependencies
 
 
-def update_is_correct(update_pages: list[str], rules_dependencies: dict[int, list[str]]) -> bool:
+def update_is_correct(update_pages: list[str], rules_dependencies: dict[str, list[str]]) -> bool:
   """Vérifie que l'update répond bien aux règles définies
   :param update: liste de pages à imprimer pour faire l'update
   :returns True si l'update est correcte, False sinon
@@ -62,7 +62,7 @@ def swap(liste: list[str], index1: int, index2: int) -> None:
     raise IndexError
 
 
-def reorder_incorrect_update(update_pages: list[str], rules_dependencies: dict[int, list[str]]) -> None:
+def reorder_incorrect_update(update_pages: list[str], rules_dependencies: dict[str, list[str]]) -> None:
   """Remet une màj incorrecte dans un ordre correct
   :returns liste des pages de la màj dans le bon ordre
   ATTENTION: la liste update_pages est modifiée EN PLACE
