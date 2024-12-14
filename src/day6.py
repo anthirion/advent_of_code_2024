@@ -1,15 +1,14 @@
 from command_line_parser import get_arguments_from_command_line
 
-visited_locations: list[tuple[int, int]] = []
-
 ################################## PART 1 ##################################
 
 
 def obstacle_ahead(grid: list[list[str]], position: tuple[int, int], direction: tuple[int, int]) -> bool:
+  obstacle_symbols = ('#', 'O')
   next_position = (position[0] + direction[0], position[1] + direction[1])
   if 0 <= next_position[0] < len(grid) and 0 <= next_position[1] < len(grid[0]):
     next_x, next_y = next_position
-    if grid[next_x][next_y] == '#':
+    if grid[next_x][next_y] in obstacle_symbols:
       return True
   return False
 
@@ -54,28 +53,81 @@ def determine_start_position_and_direction(grid: list[list[str]]) -> tuple[tuple
             init_direction = (0, -1)
           elif current_character == guard_symbols[2]:
             init_direction = (0, 1)
+  if obstacle_ahead(grid, init_position, init_direction):
+    init_direction = change_direction(init_direction)
   return init_position, init_direction
 
 
-def count_unique_locations(grid: list[list[str]]) -> int:
-  unique_locations_count = 0
+def determine_visited_locations(grid: list[list[str]]) -> list[tuple[int, int]]:
+  """Détermine le chemin du garde"""
+  visited_locations: list[tuple[int, int]] = []
   position, direction = determine_start_position_and_direction(grid)
   while 0 <= position[0] < len(grid) and 0 <= position[1] < len(grid[0]):
     if position not in visited_locations:
       visited_locations.append(position)
-      unique_locations_count += 1
-    # marquer la case comme visitée si elle ne l'est pas déjà
+    position = (position[0] + direction[0], position[1] + direction[1])
     if obstacle_ahead(grid, position, direction):
       direction = change_direction(direction)
-    position = (position[0] + direction[0], position[1] + direction[1])
-  return unique_locations_count
+  return visited_locations
+
+
+def count_unique_locations(visited_locations: list[tuple[int, int]]) -> int:
+  return len(visited_locations)
 
 
 ################################## PART 2 ##################################
 
+def stuck_in_loop(grid: list[list[str]]) -> bool:
+  """
+  Le garde est bloqué s'il repasse par un emplacement qu'il a déjà visité avec la MEME
+  direction
+  """
+  previous_positions: list[tuple[int, int]] = []
+  previous_directions: list[tuple[int, int]] = []
+  stuck = False
+  position, direction = determine_start_position_and_direction(grid)
+  while (0 <= position[0] < len(grid) and 0 <= position[1] < len(grid[0])):
+    previous_positions.append(position)
+    previous_directions.append(direction)
+    position = (position[0] + direction[0], position[1] + direction[1])
+    if obstacle_ahead(grid, position, direction):
+      direction = change_direction(direction)
+    try:
+      position_index = previous_positions.index(position)
+      if previous_directions[position_index] == direction:
+        stuck = True
+        break
+    except ValueError:
+      continue
+  return stuck
+
+
+def determine_obstructions_locations(grid: list[list[str]]) -> list[tuple[int, int]]:
+  """Détermine les positions où un obstacle peut être mis pour bloquer
+  le garde dans une boucle infinie
+  :returns liste des positions de l'obstacle 
+  """
+  obstructions_positions: list[tuple[int, int]] = []
+  visited_locations = determine_visited_locations(grid)
+  for index, position in enumerate(visited_locations[1:]):
+    print(f"{index} locations visited")
+    x, y = position
+    grid[x][y] = 'O'
+    if stuck_in_loop(grid):
+      if position not in obstructions_positions:
+        obstructions_positions.append(position)
+      # display_grid(grid)
+    grid[x][y] = '.'
+  return obstructions_positions
+
+
+def count_obstructions(obstructions_positions: list[tuple[int, int]]) -> int:
+  return len(obstructions_positions)
+
 ############################## LAUNCH PROGRAM ##############################
 
-def build_guard_path(grid: list[list[str]]) -> list[list[str]]:
+
+def build_guard_path(grid: list[list[str]], visited_locations: list[tuple[int, int]]) -> list[list[str]]:
   """Construit une nouvelle grille où le chemin par où est passé le guard est indiqué par des 'X'
   :returns nouvelle grille avec le chemin du guard et le nombre de cases différentes qu'a visité
     le guard
@@ -112,10 +164,13 @@ if __name__ == "__main__":
   filename, part = get_arguments_from_command_line()
   grid = get_grid_from_file(filename)
   if part == 1:
-    unique_locations_count = count_unique_locations(grid)
+    visited_locations = determine_visited_locations(grid)
+    unique_locations_count = count_unique_locations(visited_locations)
     # ne pas calculer ni afficher le chemin du garde si la map est trop grande
-    # guard_path = build_guard_path(grid)
+    # guard_path = build_guard_path(grid, visited_locations)
     # display_grid(guard_path)
     print("Number of locations visited:", unique_locations_count)
   elif part == 2:
-    print("Part 2 to be implemented")
+    obstructions_positions = determine_obstructions_locations(grid)
+    print("Number of possible locations for obstacle:",
+          count_obstructions(obstructions_positions))
