@@ -1,4 +1,5 @@
 from command_line_parser import get_arguments_from_command_line
+from copy import deepcopy
 
 ################################## PART 1 ##################################
 
@@ -63,8 +64,7 @@ def determine_visited_locations(grid: list[list[str]]) -> list[tuple[int, int]]:
   visited_locations: list[tuple[int, int]] = []
   position, direction = determine_start_position_and_direction(grid)
   while 0 <= position[0] < len(grid) and 0 <= position[1] < len(grid[0]):
-    if position not in visited_locations:
-      visited_locations.append(position)
+    visited_locations.append(position)
     position = (position[0] + direction[0], position[1] + direction[1])
     if obstacle_ahead(grid, position, direction):
       direction = change_direction(direction)
@@ -72,12 +72,13 @@ def determine_visited_locations(grid: list[list[str]]) -> list[tuple[int, int]]:
 
 
 def count_unique_locations(visited_locations: list[tuple[int, int]]) -> int:
-  return len(visited_locations)
+  return len(set(visited_locations))
 
 
 ################################## PART 2 ##################################
 
-def stuck_in_loop(grid: list[list[str]]) -> bool:
+def stuck_in_loop(grid: list[list[str]], start_position: tuple[int, int],
+                  start_direction: tuple[int, int]) -> bool:
   """
   Le garde est bloqué s'il repasse par un emplacement qu'il a déjà visité avec la MEME
   direction
@@ -85,7 +86,7 @@ def stuck_in_loop(grid: list[list[str]]) -> bool:
   previous_positions: list[tuple[int, int]] = []
   previous_directions: list[tuple[int, int]] = []
   stuck = False
-  position, direction = determine_start_position_and_direction(grid)
+  position, direction = start_position, start_direction
   while (0 <= position[0] < len(grid) and 0 <= position[1] < len(grid[0])):
     previous_positions.append(position)
     previous_directions.append(direction)
@@ -98,6 +99,7 @@ def stuck_in_loop(grid: list[list[str]]) -> bool:
         stuck = True
         break
     except ValueError:
+      # la position courante n'a pas été trouvée dans les anciennes positions
       continue
   return stuck
 
@@ -109,15 +111,17 @@ def determine_obstructions_locations(grid: list[list[str]]) -> list[tuple[int, i
   """
   obstructions_positions: list[tuple[int, int]] = []
   visited_locations = determine_visited_locations(grid)
+  start_position, start_direction = determine_start_position_and_direction(
+      grid)
   for index, position in enumerate(visited_locations[1:]):
     print(f"{index} locations visited")
+    local_grid = deepcopy(grid)
     x, y = position
-    grid[x][y] = 'O'
-    if stuck_in_loop(grid):
+    local_grid[x][y] = 'O'
+    if stuck_in_loop(local_grid, start_position, start_direction):
       if position not in obstructions_positions:
         obstructions_positions.append(position)
-      # display_grid(grid)
-    grid[x][y] = '.'
+      # display_grid(local_grid)
   return obstructions_positions
 
 
