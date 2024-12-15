@@ -77,6 +77,15 @@ def count_unique_locations(visited_locations: list[tuple[int, int]]) -> int:
 
 ################################## PART 2 ##################################
 
+def count_obstacles(grid: list[list[str]]) -> int:
+  """
+  Compte le nombre d'obstacles présents dans la grille
+  """
+  obstacle_symbols = ('#', 'O')
+  return sum(grid[x][y] in obstacle_symbols for x in range(len(grid))
+             for y in range(len(grid[0])))
+
+
 def stuck_in_loop(grid: list[list[str]], start_position: tuple[int, int],
                   start_direction: tuple[int, int]) -> bool:
   """
@@ -110,18 +119,20 @@ def determine_obstructions_locations(grid: list[list[str]]) -> list[tuple[int, i
   :returns liste des positions de l'obstacle 
   """
   obstructions_positions: list[tuple[int, int]] = []
-  visited_locations = determine_visited_locations(grid)
+  # visited_locations = determine_visited_locations(grid)
   start_position, start_direction = determine_start_position_and_direction(
       grid)
-  for index, position in enumerate(visited_locations[1:]):
-    print(f"{index} locations visited")
-    local_grid = deepcopy(grid)
-    x, y = position
-    local_grid[x][y] = 'O'
-    if stuck_in_loop(local_grid, start_position, start_direction):
-      if position not in obstructions_positions:
-        obstructions_positions.append(position)
-      # display_grid(local_grid)
+  init_no_obstacles = count_obstacles(grid)
+  for line in range(len(grid)):
+    for column in range(len(grid[0])):
+      local_grid = deepcopy(grid)
+      local_grid[line][column] = 'O'
+      assert count_obstacles(local_grid) == init_no_obstacles + 1
+      if stuck_in_loop(local_grid, start_position, start_direction):
+        position = (line, column)
+        if position not in obstructions_positions:
+          obstructions_positions.append(position)
+        # display_grid(local_grid)
   return obstructions_positions
 
 
