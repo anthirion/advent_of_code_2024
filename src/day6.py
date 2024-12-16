@@ -1,5 +1,6 @@
 from command_line_parser import get_arguments_from_command_line
 from copy import deepcopy
+import time
 
 ################################## PART 1 ##################################
 
@@ -54,7 +55,7 @@ def determine_start_position_and_direction(grid: list[list[str]]) -> tuple[tuple
             init_direction = (0, -1)
           elif current_character == guard_symbols[2]:
             init_direction = (0, 1)
-  if obstacle_ahead(grid, init_position, init_direction):
+  while obstacle_ahead(grid, init_position, init_direction):
     init_direction = change_direction(init_direction)
   return init_position, init_direction
 
@@ -66,7 +67,7 @@ def determine_visited_locations(grid: list[list[str]]) -> list[tuple[int, int]]:
   while 0 <= position[0] < len(grid) and 0 <= position[1] < len(grid[0]):
     visited_locations.append(position)
     position = (position[0] + direction[0], position[1] + direction[1])
-    if obstacle_ahead(grid, position, direction):
+    while obstacle_ahead(grid, position, direction):
       direction = change_direction(direction)
   return visited_locations
 
@@ -100,7 +101,7 @@ def stuck_in_loop(grid: list[list[str]], start_position: tuple[int, int],
     previous_positions.append(position)
     previous_directions.append(direction)
     position = (position[0] + direction[0], position[1] + direction[1])
-    if obstacle_ahead(grid, position, direction):
+    while obstacle_ahead(grid, position, direction):
       direction = change_direction(direction)
     try:
       position_index = previous_positions.index(position)
@@ -119,20 +120,19 @@ def determine_obstructions_locations(grid: list[list[str]]) -> list[tuple[int, i
   :returns liste des positions de l'obstacle 
   """
   obstructions_positions: list[tuple[int, int]] = []
-  # visited_locations = determine_visited_locations(grid)
+  visited_locations = determine_visited_locations(grid)
+  no_locations_to_visit = len(visited_locations)
   start_position, start_direction = determine_start_position_and_direction(
       grid)
-  init_no_obstacles = count_obstacles(grid)
-  for line in range(len(grid)):
-    for column in range(len(grid[0])):
-      local_grid = deepcopy(grid)
-      local_grid[line][column] = 'O'
-      assert count_obstacles(local_grid) == init_no_obstacles + 1
-      if stuck_in_loop(local_grid, start_position, start_direction):
-        position = (line, column)
-        if position not in obstructions_positions:
-          obstructions_positions.append(position)
-        # display_grid(local_grid)
+  for index, position in enumerate(visited_locations[1:]):
+    if index % 10 == 0:
+      print(f"Progression: {index / no_locations_to_visit * 100} %")
+    local_grid = deepcopy(grid)
+    x, y = position
+    local_grid[x][y] = 'O'
+    if stuck_in_loop(local_grid, start_position, start_direction):
+      if position not in obstructions_positions:
+        obstructions_positions.append(position)
   return obstructions_positions
 
 
@@ -177,6 +177,7 @@ def display_grid(grid: list[list[str]]) -> None:
 
 if __name__ == "__main__":
   filename, part = get_arguments_from_command_line()
+  start_time = time.time()
   grid = get_grid_from_file(filename)
   if part == 1:
     visited_locations = determine_visited_locations(grid)
@@ -189,3 +190,4 @@ if __name__ == "__main__":
     obstructions_positions = determine_obstructions_locations(grid)
     print("Number of possible locations for obstacle:",
           count_obstructions(obstructions_positions))
+  print(f"Elapsed time: {time.time() - start_time} s")
