@@ -1,0 +1,26 @@
+Fri Dec 27 14:58:18 2024    profile.bin
+
+         824931697 function calls (718093537 primitive calls) in 8616.570 seconds
+
+   Ordered by: cumulative time
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    1.374    1.374 8616.570 8616.570 day6.py:119(determine_obstructions_locations)
+106035006/6226  184.140    0.000 5025.650    0.807 copy.py:118(deepcopy)
+815606/6226 4710.104    0.006 5025.548    0.807 copy.py:191(_deepcopy_list)
+     6226   75.925    0.012 3589.089    0.576 day6.py:92(stuck_in_loop)
+ 22884170 3442.951    0.000 3442.951    0.000 {method 'index' of 'list' objects}
+212070012   63.829    0.000   63.829    0.000 {method 'get' of 'dict' objects}
+ 23461042   37.398    0.000   46.144    0.000 day6.py:10(obstacle_ahead)
+152614703   40.583    0.000   40.583    0.000 {method 'append' of 'list' objects}
+107672444   23.637    0.000   23.637    0.000 {built-in method builtins.id}
+ 92766211   18.594    0.000   18.594    0.000 {built-in method builtins.len}
+105219400   16.316    0.000   16.316    0.000 copy.py:172(_deepcopy_atomic)
+   815606    0.916    0.000    1.442    0.000 copy.py:231(_keep_alive)
+      623    0.429    0.001    0.429    0.001 {built-in method builtins.print}
+   570643    0.358    0.000    0.358    0.000 day6.py:20(change_direction)
+        1    0.005    0.005    0.020    0.020 day6.py:65(determine_visited_locations)
+        2    0.011    0.005    0.016    0.008 day6.py:40(determine_start_position_and_direction)
+        1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}
+
+
