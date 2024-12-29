@@ -1,5 +1,4 @@
 from command_line_parser import get_arguments_from_command_line
-from copy import deepcopy
 import time
 
 ################################## PART 1 ##################################
@@ -97,7 +96,8 @@ def stuck_in_loop(grid: list[list[str]], start_position: tuple[int, int],
   previous_directions: list[tuple[int, int]] = []
   stuck = False
   position, direction = start_position, start_direction
-  while (0 <= position[0] < len(grid) and 0 <= position[1] < len(grid[0])):
+  nb_lines, nb_columns = len(grid), len(grid[0])
+  while (0 <= position[0] < nb_lines and 0 <= position[1] < nb_columns):
     previous_positions.append(position)
     previous_directions.append(direction)
     position = (position[0] + direction[0], position[1] + direction[1])
@@ -127,12 +127,13 @@ def determine_obstructions_locations(grid: list[list[str]]) -> list[tuple[int, i
   for index, position in enumerate(visited_locations[1:]):
     if index % 10 == 0:
       print(f"Progression: {index / no_locations_to_visit * 100} %")
-    local_grid = deepcopy(grid)
     x, y = position
-    local_grid[x][y] = 'O'
-    if stuck_in_loop(local_grid, start_position, start_direction):
+    old_value = grid[x][y]
+    grid[x][y] = 'O'
+    if stuck_in_loop(grid, start_position, start_direction):
       if position not in obstructions_positions:
         obstructions_positions.append(position)
+    grid[x][y] = old_value
   return obstructions_positions
 
 
