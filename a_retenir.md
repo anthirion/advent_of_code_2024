@@ -21,3 +21,5 @@ with open(filename, 'r', encoding='utf8') as file:
 # Jour 5
 
 - retourner l'index où se trouve l'élément d'une liste -> list.index()
+- l'opérateur '==' compare 2 arrays élément par élément -> cela signifie que l'opérateur retourne un array de booléens auquel il faut appliquer un np.all ou np.any
+- pour comparer directement 2 arrays, utiliser la fonction np.array_equal

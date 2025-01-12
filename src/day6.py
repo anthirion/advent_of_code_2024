@@ -1,10 +1,11 @@
 from command_line_parser import get_arguments_from_command_line
 import time
+from typing import List, Tuple
 
 ################################## PART 1 ##################################
 
 
-def obstacle_ahead(grid: list[list[str]], position: tuple[int, int], direction: tuple[int, int]) -> bool:
+def obstacle_ahead(grid: List[List[str]], position: Tuple[int, int], direction: Tuple[int, int]) -> bool:
   obstacle_symbols = ('#', 'O')
   next_position = (position[0] + direction[0], position[1] + direction[1])
   if 0 <= next_position[0] < len(grid) and 0 <= next_position[1] < len(grid[0]):
@@ -14,7 +15,7 @@ def obstacle_ahead(grid: list[list[str]], position: tuple[int, int], direction: 
   return False
 
 
-def change_direction(direction: tuple[int, int]) -> tuple[int, int]:
+def change_direction(direction: Tuple[int, int]) -> Tuple[int, int]:
   """Lorsqu'un obstacle est rencontré, cette fonction détermine la nouvelle direction
   qui est l'ancienne direction tournée de 90° dans le sens des aiguilles d'une montre
   """
@@ -34,7 +35,7 @@ def change_direction(direction: tuple[int, int]) -> tuple[int, int]:
   return new_direction
 
 
-def determine_start_position_and_direction(grid: list[list[str]]) -> tuple[tuple[int, int], tuple[int, int]]:
+def determine_start_position_and_direction(grid: List[List[str]]) -> Tuple[Tuple[int, int], Tuple[int, int]]:
   """Détermine la position de départ du garde et sa direction. La position initiale du garde peut être indiquée
     par les symboles '^', '<' ou '>'. En fonction du symbole, la direction peut être droite, gauche, haut ou bas.
   :returns position (x,y) initiale du garde et sa direction (x,y)
@@ -59,9 +60,9 @@ def determine_start_position_and_direction(grid: list[list[str]]) -> tuple[tuple
   return init_position, init_direction
 
 
-def determine_visited_locations(grid: list[list[str]]) -> list[tuple[int, int]]:
+def determine_visited_locations(grid: List[List[str]]) -> List[Tuple[int, int]]:
   """Détermine le chemin du garde"""
-  visited_locations: list[tuple[int, int]] = []
+  visited_locations: List[Tuple[int, int]] = []
   position, direction = determine_start_position_and_direction(grid)
   while 0 <= position[0] < len(grid) and 0 <= position[1] < len(grid[0]):
     visited_locations.append(position)
@@ -71,13 +72,13 @@ def determine_visited_locations(grid: list[list[str]]) -> list[tuple[int, int]]:
   return visited_locations
 
 
-def count_unique_locations(visited_locations: list[tuple[int, int]]) -> int:
+def count_unique_locations(visited_locations: List[Tuple[int, int]]) -> int:
   return len(set(visited_locations))
 
 
 ################################## PART 2 ##################################
 
-def count_obstacles(grid: list[list[str]]) -> int:
+def count_obstacles(grid: List[List[str]]) -> int:
   """
   Compte le nombre d'obstacles présents dans la grille
   """
@@ -86,14 +87,14 @@ def count_obstacles(grid: list[list[str]]) -> int:
              for y in range(len(grid[0])))
 
 
-def stuck_in_loop(grid: list[list[str]], start_position: tuple[int, int],
-                  start_direction: tuple[int, int]) -> bool:
+def stuck_in_loop(grid: List[List[str]], start_position: Tuple[int, int],
+                  start_direction: Tuple[int, int]) -> bool:
   """
   Le garde est bloqué s'il repasse par un emplacement qu'il a déjà visité avec la MEME
   direction
   """
-  previous_positions: list[tuple[int, int]] = []
-  previous_directions: list[tuple[int, int]] = []
+  previous_positions: List[Tuple[int, int]] = []
+  previous_directions: List[Tuple[int, int]] = []
   stuck = False
   position, direction = start_position, start_direction
   nb_lines, nb_columns = len(grid), len(grid[0])
@@ -114,12 +115,12 @@ def stuck_in_loop(grid: list[list[str]], start_position: tuple[int, int],
   return stuck
 
 
-def determine_obstructions_locations(grid: list[list[str]]) -> list[tuple[int, int]]:
+def determine_obstructions_locations(grid: List[List[str]]) -> List[Tuple[int, int]]:
   """Détermine les positions où un obstacle peut être mis pour bloquer
   le garde dans une boucle infinie
-  :returns liste des positions de l'obstacle 
+  :returns Liste des positions de l'obstacle 
   """
-  obstructions_positions: list[tuple[int, int]] = []
+  obstructions_positions: List[Tuple[int, int]] = []
   visited_locations = determine_visited_locations(grid)
   no_locations_to_visit = len(visited_locations)
   start_position, start_direction = determine_start_position_and_direction(
@@ -137,37 +138,37 @@ def determine_obstructions_locations(grid: list[list[str]]) -> list[tuple[int, i
   return obstructions_positions
 
 
-def count_obstructions(obstructions_positions: list[tuple[int, int]]) -> int:
+def count_obstructions(obstructions_positions: List[Tuple[int, int]]) -> int:
   return len(obstructions_positions)
 
 ############################## LAUNCH PROGRAM ##############################
 
 
-def build_guard_path(grid: list[list[str]], visited_locations: list[tuple[int, int]]) -> list[list[str]]:
+def build_guard_path(grid: List[List[str]], visited_locations: List[Tuple[int, int]]) -> List[List[str]]:
   """Construit une nouvelle grille où le chemin par où est passé le guard est indiqué par des 'X'
   :returns nouvelle grille avec le chemin du guard et le nombre de cases différentes qu'a visité
     le guard
   """
-  guard_path: list[list[str]] = grid.copy()
+  guard_path: List[List[str]] = grid.copy()
   for position in visited_locations:
     x, y = position
     guard_path[x][y] = 'X'
   return guard_path
 
 
-def get_grid_from_file(filename: str) -> list[list[str]]:
+def get_grid_from_file(filename: str) -> List[List[str]]:
   """
   Récupère la grille depuis le fichier donné en paramètre
   :returns la grille qui ne contient que 3 caractères : '.', '#' et '^' (ou ses dérivés: '<', '>')
   """
-  grid: list[list[str]] = []
+  grid: List[List[str]] = []
   with open(filename, 'r', encoding='utf8') as file:
     for line in file:
       grid.append([character for character in line if character != '\n'])
   return grid
 
 
-def display_grid(grid: list[list[str]]) -> None:
+def display_grid(grid: List[List[str]]) -> None:
   """Fonction qui permet d'afficher la grille sous une forme
   plus lisible que l'affichage par défaut via print
   """
@@ -176,19 +177,24 @@ def display_grid(grid: list[list[str]]) -> None:
     print(*row_elements)
 
 
-if __name__ == "__main__":
-  filename, part = get_arguments_from_command_line()
-  start_time = time.time()
-  grid = get_grid_from_file(filename)
-  if part == 1:
-    visited_locations = determine_visited_locations(grid)
-    unique_locations_count = count_unique_locations(visited_locations)
-    # ne pas calculer ni afficher le chemin du garde si la map est trop grande
-    # guard_path = build_guard_path(grid, visited_locations)
-    # display_grid(guard_path)
-    print("Number of locations visited:", unique_locations_count)
-  elif part == 2:
-    obstructions_positions = determine_obstructions_locations(grid)
-    print("Number of possible locations for obstacle:",
-          count_obstructions(obstructions_positions))
-  print(f"Elapsed time: {time.time() - start_time} s")
+filename, part = get_arguments_from_command_line()
+start_time = time.time()
+grid = get_grid_from_file(filename)
+if part == 1:
+  visited_locations = determine_visited_locations(grid)
+  unique_locations_count = count_unique_locations(visited_locations)
+  # ne pas calculer ni afficher le chemin du garde si la map est trop grande
+  # guard_path = build_guard_path(grid, visited_locations)
+  # display_grid(guard_path)
+  print("Number of locations visited:", unique_locations_count)
+elif part == 2:
+  obstructions_positions = determine_obstructions_locations(grid)
+  print("Number of possible locations for obstacle:",
+        count_obstructions(obstructions_positions))
+print(f"Elapsed time: {time.time() - start_time} s")
+
+# IMPORTANT : si le fichier est compilé avec mypyc s'assurer des choses suivantes :
+# 1. La ligne "if __name__ == __main__" est bien retirée
+# 2. Compiler le fichier et ses dépendances (imports)
+# 3. Lancer le programme avec la commande suivante :
+# python -c "import sys; sys.argv = ['day6', '.\inputs\day6.txt', '-p=2']; import day6"
