@@ -3,7 +3,7 @@
 src/__pycache__/
 build/
 *.pyd
-.aoc/
+aoc/
 src/*.so
 src/*.c
 src/core
