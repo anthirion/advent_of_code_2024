@@ -84,52 +84,45 @@ def stuck_in_loop(grid: list[list[str]], start_position: tuple[int, int],
   Le garde est bloqué s'il repasse par un emplacement qu'il a déjà visité avec la MEME
   direction
   """
-  previous_positions: list[tuple[int, int]] = []
-  previous_directions: list[tuple[int, int]] = []
+  # pour accélérer la fonction, remplacer les listes previous_positions et previous_directions
+  # par un dictionnaire dont la clé est la position et la valeur est la direction
+  history = {}
   stuck = False
   position, direction = start_position, start_direction
   nb_lines, nb_columns = len(grid), len(grid[0])
   while (0 <= position[0] < nb_lines and 0 <= position[1] < nb_columns):
-    previous_positions.append(position)
-    previous_directions.append(direction)
+    history[position] = direction
     position = (position[0] + direction[0], position[1] + direction[1])
     while obstacle_ahead(grid, position, direction):
       direction = change_direction(direction)
-    try:
-      position_index = previous_positions.index(position)
-      if previous_directions[position_index] == direction:
-        stuck = True
-        break
-    except ValueError:
-      # la position courante n'a pas été trouvée dans les anciennes positions
-      continue
+    # éviter les try-except couteux et les remplacer par des if
+    if position in history and history[position] == direction:
+      stuck = True
+      break
   return stuck
 
 
-def determine_obstructions_locations(grid: list[list[str]]) -> list[tuple[int, int]]:
+def determine_obstructions_locations(grid: list[list[str]]) -> set[tuple[int, int]]:
   """Détermine les positions où un obstacle peut être mis pour bloquer
   le garde dans une boucle infinie
   :returns liste des positions de l'obstacle 
   """
-  obstructions_positions: list[tuple[int, int]] = []
+  obstructions_positions: set[tuple[int, int]] = set()
   visited_locations = determine_visited_locations(grid)
-  no_locations_to_visit = len(visited_locations)
   start_position, start_direction = determine_start_position_and_direction(
       grid)
-  for index, position in enumerate(visited_locations[1:]):
-    if index % 50 == 0:
-      print(f"Progression: {round(index / no_locations_to_visit * 100, 2)} %")
+  for position in visited_locations[1:]:
     x, y = position
     old_value = grid[x][y]
     grid[x][y] = 'O'
     if stuck_in_loop(grid, start_position, start_direction):
       if position not in obstructions_positions:
-        obstructions_positions.append(position)
+        obstructions_positions.add(position)
     grid[x][y] = old_value
   return obstructions_positions
 
 
-def count_obstructions(obstructions_positions: list[tuple[int, int]]) -> int:
+def count_obstructions(obstructions_positions: set[tuple[int, int]]) -> int:
   return len(obstructions_positions)
 
 ############################## LAUNCH PROGRAM ##############################

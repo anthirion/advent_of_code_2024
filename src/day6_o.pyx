@@ -67,6 +67,8 @@ cpdef ((int, int), (int, int)) determine_start_position_and_direction():
 
 cpdef list determine_visited_locations():
   """Détermine le chemin du garde"""
+  # ne pas changer visited_locations en set car il doit y avoir des doublons
+  # dans la liste pour la partie 2
   visited_locations = []
   position, direction = determine_start_position_and_direction()
   while 0 <= position[0] < N_ROWS and 0 <= position[1] < N_COLUMNS:
@@ -89,54 +91,43 @@ cpdef bint stuck_in_loop((int, int) start_position, (int, int) start_direction):
   Le garde est bloqué s'il repasse par un emplacement qu'il a déjà visité avec la MEME
   direction
   """
-  previous_positions = []
-  previous_directions = []
+  # pour accélérer la fonction, remplacer les listes previous_positions et previous_directions
+  # par un dictionnaire dont la clé est la position et la valeur est la direction
+  cdef dict history = {}
   stuck = False
   position, direction = start_position, start_direction
-  cdef int x = position[0]
-  cdef int y = position[1]
-  while (0 <= x < N_ROWS and 0 <= y < N_COLUMNS):
-    previous_positions.append(position)
-    previous_directions.append(direction)
-    position = (x + direction[0], y + direction[1])
-    x = position[0]
-    y = position[1]
+  while (0 <= position[0] < N_ROWS and 0 <= position[1] < N_COLUMNS):
+    history[position] = direction
+    position = (position[0] + direction[0], position[1] + direction[1])
     while obstacle_ahead(position, direction):
       direction = change_direction(direction)
-    try:
-      position_index = previous_positions.index(position)
-      if previous_directions[position_index] == direction:
+    # éviter les try-except couteux en Cython et les remplacer par des if
+    if position in history and history[position] == direction:
         stuck = True
         break
-    except ValueError:
-      # la position courante n'a pas été trouvée dans les anciennes positions
-      continue
   return stuck
 
 
-cpdef list determine_obstructions_locations():
+cpdef set determine_obstructions_locations():
   """Détermine les positions où un obstacle peut être mis pour bloquer
   le garde dans une boucle infinie
   :returns liste des positions de l'obstacle 
   """
-  obstructions_positions = []
+  cdef set obstructions_positions = set()
   visited_locations = determine_visited_locations()
   nb_locations_to_visit = len(visited_locations)
   start_position, start_direction = determine_start_position_and_direction()
-  for index, position in enumerate(visited_locations[1:]):
-    if index % 50 == 0:
-      print(f"Progression: {round(index / nb_locations_to_visit * 100, 2)} %")
+  for position in visited_locations[1:]:
     x, y = position
     old_value = chr(grid[x][y])
     grid[x][y] = b'O'
     if stuck_in_loop(start_position, start_direction):
-      if position not in obstructions_positions:
-        obstructions_positions.append(position)
+      obstructions_positions.add(position)
     grid[x][y] = ord(old_value)
   return obstructions_positions
 
 
-cpdef int count_obstructions(list obstructions_positions):
+cpdef int count_obstructions(set obstructions_positions):
   return len(obstructions_positions)
 
 ############################## LAUNCH PROGRAM ##############################
@@ -159,7 +150,7 @@ cpdef void init_grid_from_file(str filename):
       index_in_content = x * N_COLUMNS + y
       grid[x][y] = ord(content[index_in_content])
 
-cdef void display_grid():
+cpdef void display_grid():
   """Fonction qui permet d'afficher la grille sous une forme
   plus lisible que l'affichage par défaut via print
   """
