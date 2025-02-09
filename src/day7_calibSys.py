@@ -17,10 +17,10 @@ class CalibrationSystem:
       parts = line.split(':')
       if len(parts) == 2:
         try:
-          testValue = float(parts[0].strip())
+          testValue = int(parts[0].strip())
           numbers_str = parts[1].strip()
           # Convert to list of integers
-          numbers = [float(x) for x in numbers_str.split()]
+          numbers = [int(x) for x in numbers_str.split()]
           equation = Equation(testValue, numbers)
           equations.append(equation)
         except ValueError:

@@ -1,6 +1,6 @@
 class Equation:
 
-  operators = ('+', '*')
+  operators = ('+', '*', '||')
 
   class Operation:
     """
@@ -24,6 +24,8 @@ class Equation:
           result += operand
         elif operator == '*':
           result *= operand
+        elif operator == '||':
+          result = int(str(result) + str(operand))
 
       return result
 

@@ -6,6 +6,5 @@ if __name__ == "__main__":
   filename, part = get_arguments_from_command_line()
   calibSys = CalibrationSystem(filename)
   if part == 1 or part == 2:
-    pass
     calibResult = calibSys.totalCalibrationResult
     print("Total calibration result:", calibResult)
