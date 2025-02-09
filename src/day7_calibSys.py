@@ -30,7 +30,7 @@ class CalibrationSystem:
 
     return equations
 
-  def getLinesFromInputFile(self) -> str:
+  def getLinesFromInputFile(self) -> list[str]:
     lines = []
     with open(self.inputFileName, 'r', encoding='utf8') as file:
       for line in file:

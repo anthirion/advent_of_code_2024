@@ -68,7 +68,7 @@ class Equation:
     for expr in self.operationGenerator():
       if expr.isCorrect():
         return expr.testValue
-    return 0.0
+    return 0
 
   def __str__(self) -> str:
     operands_str = " ".join(map(str, self.operands))
